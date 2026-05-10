@@ -1,7 +1,7 @@
 "use client";
 
 import CreateTaskModal from "@/components/tasks/CreateTaskModal";
-import DeleteConfirmModal from "@/components/ui/DeleteConfirmModal";
+import DeleteConfirmModal from "@/components/ui/deleteConfirmModal";
 import { useTask } from "@/hooks/tasks/useTasks";
 import { useDeleteTask } from "@/hooks/tasks/useTasks";
 import {
