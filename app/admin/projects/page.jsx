@@ -4,7 +4,7 @@ import DashboardLayout from "@/components/dashboard/DashboardLayout";
 import ProjectList from "@/components/dashboard/ProjectList";
 import AdminRoute from "@/components/auth/AdminRoute";
 import { useAdminProjects } from "@/hooks/admin/useAdmin";
-import { ProjectCardSkeleton } from "@/components/skeletons/ProjectCArd";
+import { ProjectCardSkeleton } from "@/components/skeletons/ProjectCard";
 
 export default function AdminPage() {
     const {

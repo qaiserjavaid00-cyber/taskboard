@@ -1,11 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { useQuery, useMutation, useQueryClient, } from "@tanstack/react-query";
+import { useQueryClient, } from "@tanstack/react-query";
 import { Users, FolderKanban, CheckCircle2, Clock3, AlertCircle, Plus, } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { addMemberToProject } from "@/lib/api/users";
-import { getProject } from "@/lib/api/projects";
 import CreateTaskModal from "@/components/tasks/CreateTaskModal";
 import { useTasks } from "@/hooks/tasks/useTasks";
 import { useAddMemberToProject, useGetUsers, useRemoveMemberFromProject } from "@/hooks/users/useUsers";
