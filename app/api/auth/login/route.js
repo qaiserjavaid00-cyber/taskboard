@@ -52,14 +52,14 @@ export async function POST(req) {
 
     res.cookies.set("token", accessToken, {
         httpOnly: true,
-        secure: false, // true in production
+        secure: true, // true in production
         sameSite: "lax",
         path: "/",
     });
 
     res.cookies.set("refreshToken", refreshToken, {
         httpOnly: true,
-        secure: false,
+        secure: true,
         sameSite: "lax",
         path: "/",
     });
