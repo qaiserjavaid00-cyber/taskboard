@@ -7,7 +7,7 @@ import ProjectList from "@/components/dashboard/ProjectList";
 import StatsCards from "@/components/dashboard/StatsCard";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import { useTasks } from "@/hooks/tasks/useTasks";
-import { ProjectCardSkeleton } from "@/components/skeletons/ProjectCArd";
+import { ProjectCardSkeleton } from "@/components/skeletons/ProjectCard";
 import { StatsSkeleton } from "@/components/skeletons/StatsSkeleton";
 import { useGetProjects } from "@/hooks/projects/useProjects";
 
