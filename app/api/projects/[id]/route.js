@@ -4,6 +4,8 @@ import { NextResponse } from "next/server";
 import { verifyToken } from "@/lib/auth";
 import { cookies } from "next/headers";
 import getUser from "@/lib/helpers/getUser";
+import Task from "@/lib/models/Task";
+import User from "@/lib/models/User";
 
 function getUserFromReq() {
     const token = cookies().get("token")?.value;

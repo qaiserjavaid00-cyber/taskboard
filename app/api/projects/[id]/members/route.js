@@ -1,6 +1,7 @@
 import { connectDB } from "@/lib/db";
 import Project from "@/lib/models/Project";
 import User from "@/lib/models/User";
+import Task from "@/lib/models/Task";
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { verifyToken } from "@/lib/auth";

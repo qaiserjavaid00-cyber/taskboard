@@ -1,6 +1,7 @@
 import { connectDB } from "@/lib/db";
 import Task from "@/lib/models/Task";
 import Project from "@/lib/models/Project";
+import User from "@/lib/models/User";
 import { NextResponse } from "next/server";
 import { createTaskSchema } from "@/lib/validators/task";
 import { cookies } from "next/headers";
