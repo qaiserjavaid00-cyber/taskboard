@@ -6,6 +6,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema } from "@/lib/validators/auth";
 import api from "@/lib/api/axios";
+import { Loader2 } from "lucide-react";
 
 export default function LoginForm() {
     const router = useRouter();
@@ -17,14 +18,6 @@ export default function LoginForm() {
     } = useForm({
         resolver: zodResolver(loginSchema),
     });
-
-    // const mutation = useMutation({
-    //     mutationFn: (data) => api.post("/auth/login", data),
-
-    //     onSuccess: () => {
-    //         router.push("/dashboard");
-    //     },
-    // });
 
     const mutation = useMutation({
         mutationFn: (data) => api.post("/auth/login", data),
@@ -85,7 +78,7 @@ export default function LoginForm() {
                 disabled={mutation.isPending}
                 className="w-full bg-blue-600 text-white py-2 rounded"
             >
-                {mutation.isPending ? "Logging in..." : "Login"}
+                {mutation.isPending ? <span className="flex gap-1"><Loader2 className="animate-spin" />wait...</span> : "Login"}
             </button>
         </form>
     );

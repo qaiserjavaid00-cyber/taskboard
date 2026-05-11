@@ -6,6 +6,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { registerSchema } from "@/lib/validators/auth";
 import api from "@/lib/api/axios";
+import { Loader2 } from "lucide-react";
 
 export default function RegisterForm() {
     const router = useRouter();
@@ -81,7 +82,7 @@ export default function RegisterForm() {
                 disabled={mutation.isPending}
                 className="w-full bg-blue-600 text-white py-2 rounded"
             >
-                {mutation.isPending ? "Creating..." : "Register"}
+                {mutation.isPending ? <span className="flex gap-1"><Loader2 className="animate-spin" />wait...</span> : "Register"}
             </button>
         </form>
     );
