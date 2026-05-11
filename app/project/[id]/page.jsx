@@ -11,6 +11,7 @@ import { TaskSkeleton } from "@/components/skeletons/TaskSkeleton";
 import { TeamSkeleton } from "@/components/skeletons/TeamSkeleton";
 import { StatsSkeleton } from "@/components/skeletons/StatsSkeleton";
 import { useGetProject } from "@/hooks/projects/useProjects";
+import Link from "next/link";
 
 
 const statusColors = {
@@ -42,10 +43,7 @@ const ProjectDetailsPage = ({ params }) => {
 
     const removeMember = useRemoveMemberFromProject(projectId);
     const addMember = useAddMemberToProject(projectId)
-    // const { data: project } = useQuery({
-    //     queryKey: ["project", projectId],
-    //     queryFn: () => getProject(projectId),
-    // });
+
     const handleAddMember = () => {
         addMember.mutate(
             {
@@ -70,22 +68,6 @@ const ProjectDetailsPage = ({ params }) => {
         return !isAlreadyMember && !isAdmin;
     });
 
-    // ADD MEMBER
-    // const addMember = useMutation({
-    //     mutationFn: ({ userId }) =>
-    //         addMemberToProject(projectId, userId),
-
-    //     onSuccess: () => {
-    //         setSelectedUser("");
-
-    //         queryClient.invalidateQueries({
-    //             queryKey: ["project", projectId],
-    //         });
-    //     },
-    // });
-
-
-
     const completedTasks =
         tasks?.filter(
             (task) => task.status === "done"
@@ -105,7 +87,7 @@ const ProjectDetailsPage = ({ params }) => {
 
                                 <div>
                                     <h1 className="text-3xl font-bold tracking-tight">
-                                        Project Dashboard
+                                        <Link href="/dashboard"> Project Dashboard</Link>
                                     </h1>
 
                                     <p className="text-slate-400 mt-1">

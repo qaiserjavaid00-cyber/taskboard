@@ -6,7 +6,9 @@ const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET);
 export async function middleware(req) {
     const { pathname } = req.nextUrl;
 
-    // allow public routes
+    const token = req.cookies.get("token")?.value;
+
+    // PUBLIC API ROUTES
     if (
         pathname.startsWith("/api/auth/login") ||
         pathname.startsWith("/api/auth/register") ||
@@ -15,34 +17,71 @@ export async function middleware(req) {
         return NextResponse.next();
     }
 
-    const token = req.cookies.get("token")?.value;
+    // LOGIN / REGISTER REDIRECT
+    if (
+        pathname === "/login" ||
+        pathname === "/register"
+    ) {
+        if (token) {
+            try {
+                await jwtVerify(token, JWT_SECRET);
 
-    // console.log("MIDDLEWARE TOKEN:", token);
+                return NextResponse.redirect(
+                    new URL("/dashboard", req.url)
+                );
+            } catch {
+                // invalid token -> allow access to login
+                return NextResponse.next();
+            }
+        }
 
-    if (!token) {
-        return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+        return NextResponse.next();
     }
 
-    try {
-        const { payload } = await jwtVerify(token, JWT_SECRET);
+    // PROTECT API ROUTES
+    if (pathname.startsWith("/api")) {
+        if (!token) {
+            return NextResponse.json(
+                { message: "Unauthorized" },
+                { status: 401 }
+            );
+        }
 
-        // console.log("DECODED USER:", payload);
+        try {
+            const { payload } = await jwtVerify(
+                token,
+                JWT_SECRET
+            );
 
-        const requestHeaders = new Headers(req.headers);
-        requestHeaders.set("user", JSON.stringify(payload));
+            const requestHeaders = new Headers(req.headers);
 
-        return NextResponse.next({
-            request: {
-                headers: requestHeaders,
-            },
-        });
-    } catch (err) {
-        console.log("JWT ERROR:", err.message);
+            requestHeaders.set(
+                "user",
+                JSON.stringify(payload)
+            );
 
-        return NextResponse.json({ message: "Invalid token" }, { status: 401 });
+            return NextResponse.next({
+                request: {
+                    headers: requestHeaders,
+                },
+            });
+        } catch (err) {
+            console.log("JWT ERROR:", err.message);
+
+            return NextResponse.json(
+                { message: "Invalid token" },
+                { status: 401 }
+            );
+        }
     }
+
+    return NextResponse.next();
 }
 
 export const config = {
-    matcher: ["/api/:path*"],
+    matcher: [
+        "/api/:path*",
+        "/login",
+        "/register",
+    ],
 };

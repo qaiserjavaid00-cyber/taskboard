@@ -17,6 +17,7 @@ import {
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { TaskDetailsSkeleton } from "@/components/skeletons/TaskDetailSkeleton";
+import Link from "next/link";
 
 
 const statusStyles = {
@@ -66,7 +67,9 @@ export default function TaskDetailsPage({ params }) {
                             {task.title}
                         </h1>
                         <p className="text-sm text-slate-400">
-                            {task.project?.title || "Unknown Owner"}
+                            <Link href={`/project/${task?.project?._id}`}>
+                                {task.project?.title}
+                            </Link>
                         </p>
 
                     </div>
