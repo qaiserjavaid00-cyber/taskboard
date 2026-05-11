@@ -66,8 +66,10 @@ const ProjectTeamSection = ({
                             <TeamMemberCard
                                 key={user?._id}
                                 user={user}
-                                isOwner={
-                                    project?.owner?._id === user?._id
+                                isOwner={project?.owner?._id === user?._id}
+                                isRemoving={
+                                    removeMember.isPending
+                                    // removeMember.variables === user._id
                                 }
                                 onRemove={(id) =>
                                     removeMember.mutate(id)

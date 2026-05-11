@@ -1,9 +1,12 @@
 "use client";
 
+import { Loader2 } from "lucide-react";
+
 const TeamMemberCard = ({
     user,
     isOwner,
     onRemove,
+    isRemoving
 }) => {
     return (
         <div className="flex items-center justify-between bg-[#111827] border border-white/5 rounded-xl px-4 py-3">
@@ -31,15 +34,24 @@ const TeamMemberCard = ({
                 </span>
 
                 {!isOwner && (
-                    <button
-                        onClick={() =>
-                            onRemove(user._id)
-                        }
-                        className="text-red-400 hover:text-red-300 text-lg font-bold"
-                        title="Remove member"
-                    >
-                        ×
-                    </button>
+                    <>
+                        {isRemoving ? (
+                            <Loader2
+                                size={18}
+                                className="animate-spin text-red-400"
+                            />
+                        ) : (
+                            <button
+                                onClick={() =>
+                                    onRemove(user._id)
+                                }
+                                className="text-red-400 hover:text-red-300 text-lg font-bold"
+                                title="Remove member"
+                            >
+                                ×
+                            </button>
+                        )}
+                    </>
                 )}
             </div>
         </div>
