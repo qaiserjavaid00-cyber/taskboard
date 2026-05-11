@@ -1,10 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import ProjectActionsDropdown from "../projects/ProjectActionsDropDown";
 
 export default function ProjectCard({ project }) {
-
-
     const initial =
         project.title?.charAt(0).toUpperCase();
 
@@ -14,27 +13,10 @@ export default function ProjectCard({ project }) {
             .slice(0, 5)
             .join(" ") + "...";
 
-    // TASK STATS
-    const totalTasks = project.tasks?.length || 0;
-
-    const completedTasks =
-        project.tasks?.filter(
-            (task) => task.status === "done"
-        ).length || 0;
-
-    const progress =
-        totalTasks === 0
-            ? 0
-            : Math.round(
-                (completedTasks / totalTasks) * 100
-            );
-
     return (
-        <Link href={`/project/${project._id}`}>
-            <div className="bg-white/5 border border-white/10 hover:border-blue-500/30 transition rounded-2xl p-5 cursor-pointer">
-
-                {/* TOP SECTION */}
-                <div className="flex items-center justify-between">
+        <div className="relative">
+            <Link href={`/project/${project._id}`}>
+                <div className="bg-white/5 border border-white/10 hover:border-blue-500/30 transition rounded-2xl p-5 cursor-pointer">
 
                     <div className="flex items-center gap-4">
 
@@ -54,21 +36,13 @@ export default function ProjectCard({ project }) {
                             </p>
                         </div>
                     </div>
-
-                    {/* RIGHT SIDE */}
-                    <div className="hidden md:flex flex-col items-end">
-                        <p className="text-xl font-bold text-white">
-                            {progress}%
-                        </p>
-
-                        <p className="text-xs text-slate-500">
-                            Completed
-                        </p>
-                    </div>
                 </div>
+            </Link>
 
-
+            {/* DROPDOWN */}
+            <div className="absolute top-4 right-4">
+                <ProjectActionsDropdown project={project} />
             </div>
-        </Link>
+        </div>
     );
 }

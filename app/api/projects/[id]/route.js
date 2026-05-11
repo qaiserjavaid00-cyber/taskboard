@@ -3,6 +3,7 @@ import Project from "@/lib/models/Project";
 import { NextResponse } from "next/server";
 import { verifyToken } from "@/lib/auth";
 import { cookies } from "next/headers";
+import getUser from "@/lib/helpers/getUser";
 
 function getUserFromReq() {
     const token = cookies().get("token")?.value;
@@ -54,4 +55,91 @@ export async function GET(req, { params }) {
     }
 
     return NextResponse.json(project);
+}
+
+//////EDIT/////////////////////
+
+export async function PATCH(req, { params }) {
+    await connectDB();
+
+    const user = getUser();
+
+    if (!user) {
+        return NextResponse.json(
+            { message: "Unauthorized" },
+            { status: 401 }
+        );
+    }
+
+    const project = await Project.findById(params.id);
+
+    if (!project) {
+        return NextResponse.json(
+            { message: "Project not found" },
+            { status: 404 }
+        );
+    }
+
+    const isAdmin = user?.role === "admin";
+    const isOwner = project?.owner.toString() === user?.userId;
+
+    if (!isAdmin && !isOwner) {
+        return NextResponse.json(
+            { message: "Forbidden" },
+            { status: 403 }
+        );
+    }
+
+    const body = await req.json();
+
+    const updatedProject = await Project.findByIdAndUpdate(
+        params.id,
+        {
+            title: body.title,
+            description: body.description,
+        },
+        { new: true }
+    );
+
+    return NextResponse.json(updatedProject);
+}
+
+/////////DELETE///////////////////////////////////
+
+export async function DELETE(req, { params }) {
+    await connectDB();
+
+    const user = getUser();
+
+    if (!user) {
+        return NextResponse.json(
+            { message: "Unauthorized" },
+            { status: 401 }
+        );
+    }
+
+    const project = await Project.findById(params.id);
+
+    if (!project) {
+        return NextResponse.json(
+            { message: "Project not found" },
+            { status: 404 }
+        );
+    }
+
+    const isAdmin = user?.role === "admin";
+    const isOwner = project?.owner.toString() === user.userId;
+
+    if (!isAdmin && !isOwner) {
+        return NextResponse.json(
+            { message: "Forbidden" },
+            { status: 403 }
+        );
+    }
+
+    await Project.findByIdAndDelete(params.id);
+
+    return NextResponse.json({
+        message: "Project deleted successfully",
+    });
 }

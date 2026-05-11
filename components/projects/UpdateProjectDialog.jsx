@@ -1,3 +1,5 @@
+
+
 "use client";
 
 import {
@@ -5,22 +7,41 @@ import {
     DialogContent,
     DialogHeader,
     DialogTitle,
-    DialogTrigger,
 } from "@/components/ui/dialog";
 
-import { useState } from "react";
-import { useCreateProject } from "@/hooks/projects/useProjects";
+import { useEffect, useState } from "react";
+import {
+    useCreateProject,
+    useUpdateProject,
+} from "@/hooks/projects/useProjects";
 
-export default function CreateProjectDialog({ children }) {
-    const [open, setOpen] = useState(false);
-
+export default function UpdateProjectDialog({
+    isOpen,
+    onClose,
+    mode = "create",
+    project = null,
+}) {
     const createProject = useCreateProject();
+    const updateProject = useUpdateProject();
+
+    const isEdit = mode === "edit";
 
     const [form, setForm] = useState({
         title: "",
         description: "",
     });
 
+    // ✅ PREFILL WHEN EDIT OPENS
+    useEffect(() => {
+        if (isEdit && project && isOpen) {
+            setForm({
+                title: project.title || "",
+                description: project.description || "",
+            });
+        }
+    }, [isEdit, project, isOpen]);
+
+    // INPUT CHANGE
     const handleChange = (e) => {
         setForm({
             ...form,
@@ -28,11 +49,30 @@ export default function CreateProjectDialog({ children }) {
         });
     };
 
+    // SUBMIT
     const handleSubmit = (e) => {
         e.preventDefault();
 
         if (!form.title.trim()) return;
 
+        // EDIT MODE
+        if (isEdit) {
+            updateProject.mutate(
+                {
+                    id: project._id,
+                    data: form,
+                },
+                {
+                    onSuccess: () => {
+                        onClose();
+                    },
+                }
+            );
+
+            return;
+        }
+
+        // CREATE MODE
         createProject.mutate(form, {
             onSuccess: () => {
                 setForm({
@@ -40,22 +80,35 @@ export default function CreateProjectDialog({ children }) {
                     description: "",
                 });
 
-                setOpen(false);
+                onClose();
             },
         });
     };
 
-    return (
-        <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild>{children}</DialogTrigger>
+    const isPending =
+        createProject.isPending ||
+        updateProject.isPending;
 
+    const isError =
+        createProject.isError ||
+        updateProject.isError;
+
+    return (
+        <Dialog open={isOpen} onOpenChange={onClose}>
             <DialogContent className="bg-[#0f172a] border border-white/10 text-white">
+
+                {/* HEADER */}
                 <DialogHeader>
-                    <DialogTitle>Create Project</DialogTitle>
+                    <DialogTitle>
+                        {isEdit ? "Update Project" : "Create Project"}
+                    </DialogTitle>
                 </DialogHeader>
 
-                <form onSubmit={handleSubmit} className="space-y-4 mt-4">
-
+                {/* FORM */}
+                <form
+                    onSubmit={handleSubmit}
+                    className="space-y-4 mt-4"
+                >
                     {/* TITLE */}
                     <input
                         name="title"
@@ -80,7 +133,7 @@ export default function CreateProjectDialog({ children }) {
                     <div className="flex justify-end gap-3">
                         <button
                             type="button"
-                            onClick={() => setOpen(false)}
+                            onClick={onClose}
                             className="px-4 py-2 rounded-xl bg-white/5 text-white"
                         >
                             Cancel
@@ -88,18 +141,23 @@ export default function CreateProjectDialog({ children }) {
 
                         <button
                             type="submit"
-                            disabled={createProject.isPending}
+                            disabled={isPending}
                             className="px-4 py-2 rounded-xl bg-blue-600 text-white"
                         >
-                            {createProject.isPending
-                                ? "Creating..."
-                                : "Create Project"}
+                            {isPending
+                                ? isEdit
+                                    ? "Updating..."
+                                    : "Creating..."
+                                : isEdit
+                                    ? "Update Project"
+                                    : "Create Project"}
                         </button>
                     </div>
 
-                    {createProject.isError && (
+                    {/* ERROR */}
+                    {isError && (
                         <p className="text-red-500 text-sm">
-                            Failed to create project
+                            Something went wrong
                         </p>
                     )}
                 </form>
@@ -107,4 +165,3 @@ export default function CreateProjectDialog({ children }) {
         </Dialog>
     );
 }
-
