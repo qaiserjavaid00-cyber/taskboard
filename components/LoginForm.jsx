@@ -78,7 +78,7 @@ export default function LoginForm() {
                 disabled={mutation.isPending}
                 className="w-full bg-blue-600 text-white py-2 rounded"
             >
-                {mutation.isPending ? <span className="flex gap-1"><Loader2 className="animate-spin" />wait...</span> : "Login"}
+                {mutation.isPending ? <span className="flex justify-center items-center gap-1"><Loader2 className="animate-spin" />wait...</span> : "Login"}
             </button>
         </form>
     );

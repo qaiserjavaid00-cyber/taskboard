@@ -82,7 +82,7 @@ export default function RegisterForm() {
                 disabled={mutation.isPending}
                 className="w-full bg-blue-600 text-white py-2 rounded"
             >
-                {mutation.isPending ? <span className="flex gap-1"><Loader2 className="animate-spin" />wait...</span> : "Register"}
+                {mutation.isPending ? <span className="flex justify-center items-center gap-1"><Loader2 className="animate-spin" />wait...</span> : "Register"}
             </button>
         </form>
     );
