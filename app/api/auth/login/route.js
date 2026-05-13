@@ -52,18 +52,18 @@ export async function POST(req) {
 
     res.cookies.set("token", accessToken, {
         httpOnly: true,
-        // secure: false,
+        secure: false,
         // secure: process.env.NODE_ENV === "production",
-        secure: true,
+        // secure: true,
         sameSite: "lax",
         path: "/",
     });
 
     res.cookies.set("refreshToken", refreshToken, {
         httpOnly: true,
-        // secure: false,
+        secure: false,
         // secure: process.env.NODE_ENV === "production",
-        secure: true,
+        // secure: true,
         sameSite: "lax",
         path: "/",
     });

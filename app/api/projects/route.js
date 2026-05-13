@@ -4,6 +4,7 @@ import User from "@/lib/models/User";
 import { NextResponse } from "next/server";
 import { verifyToken } from "@/lib/auth";
 import { cookies } from "next/headers";
+import { createProjectSchema } from "@/lib/validators/project";
 
 function getUserFromReq() {
     const token = cookies().get("token")?.value;
@@ -22,13 +23,39 @@ function getUserFromReq() {
     }
 }
 
+////////Create project/////////////////////////
+
+// export async function POST(req) {
+//     // console.log("PROJECT API HIT");
+//     // console.log("TOKEN:", cookies().get("token"));
+//     await connectDB();
+
+//     const user = getUserFromReq();
+//     // console.log("user from create project api", user)
+//     if (!user) {
+//         return NextResponse.json(
+//             { message: "Unauthorized" },
+//             { status: 401 }
+//         );
+//     }
+
+//     const { title, description } = await req.json();
+
+//     const project = await Project.create({
+//         title,
+//         description,
+//         owner: user.userId,
+//         members: [user.userId],
+//     });
+
+//     return NextResponse.json(project, { status: 201 });
+// }
+
 export async function POST(req) {
-    // console.log("PROJECT API HIT");
-    // console.log("TOKEN:", cookies().get("token"));
     await connectDB();
 
     const user = getUserFromReq();
-    // console.log("user from create project api", user)
+
     if (!user) {
         return NextResponse.json(
             { message: "Unauthorized" },
@@ -36,18 +63,39 @@ export async function POST(req) {
         );
     }
 
-    const { title, description } = await req.json();
+    try {
+        const body = await req.json();
 
-    const project = await Project.create({
-        title,
-        description,
-        owner: user.userId,
-        members: [user.userId],
-    });
+        // ZOD VALIDATION
+        const validatedData =
+            createProjectSchema.parse(body);
 
-    return NextResponse.json(project, { status: 201 });
+        const project = await Project.create({
+            ...validatedData,
+            owner: user.userId,
+            members: [user.userId],
+        });
+
+        return NextResponse.json(project, {
+            status: 201,
+        });
+
+    } catch (error) {
+        console.log(error);
+
+        return NextResponse.json(
+            {
+                message:
+                    error?.errors?.[0]?.message ||
+                    "Validation failed",
+            },
+            { status: 400 }
+        );
+    }
 }
 
+
+/////Get  All projects
 
 export async function GET(req) {
     try {

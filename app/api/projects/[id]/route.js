@@ -22,6 +22,8 @@ function getUserFromReq() {
     }
 }
 
+///////Get project by ID
+
 export async function GET(req, { params }) {
     await connectDB();
 

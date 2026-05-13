@@ -1,50 +1,29 @@
 "use client";
 
 import { useState } from "react";
-import { useQueryClient, } from "@tanstack/react-query";
-import { Users, FolderKanban, CheckCircle2, Clock3, AlertCircle, Plus, } from "lucide-react";
-import { useRouter } from "next/navigation";
-import CreateTaskModal from "@/components/tasks/CreateTaskModal";
-import { useTasks } from "@/hooks/tasks/useTasks";
-import { useAddMemberToProject, useGetUsers, useRemoveMemberFromProject } from "@/hooks/users/useUsers";
-import { TaskSkeleton } from "@/components/skeletons/TaskSkeleton";
-import { TeamSkeleton } from "@/components/skeletons/TeamSkeleton";
-import { StatsSkeleton } from "@/components/skeletons/StatsSkeleton";
-import { useGetProject } from "@/hooks/projects/useProjects";
-import Link from "next/link";
+
 import ProjectHeader from "@/components/projects/ProjectHeader";
 import ProjectStats from "@/components/projects/ProjectStats";
+
+import { StatsSkeleton } from "@/components/skeletons/StatsSkeleton";
 import ProjectTasksSection from "@/components/tasks/ProjectTasksSection";
 import ProjectTeamSection from "@/components/projects/ProjectsTeamSection";
 
-
-// const statusColors = {
-//     todo: "bg-yellow-100 text-yellow-700 border border-yellow-200",
-//     "in-progress": "bg-blue-100 text-blue-700 border border-blue-200",
-//     done: "bg-emerald-100 text-emerald-700 border border-emerald-200",
-// };
-// const priorityColors = {
-//     high: "text-red-500",
-//     medium: "text-orange-500",
-//     low: "text-green-500",
-// };
+import { useTasks } from "@/hooks/tasks/useTasks";
+import { useAddMemberToProject, useGetUsers, useRemoveMemberFromProject } from "@/hooks/users/useUsers";
+import { useGetProject } from "@/hooks/projects/useProjects";
+import CreateTaskModal from "@/components/tasks/CreateTaskModal";
 
 const ProjectDetailsPage = ({ params }) => {
-    const router = useRouter();
+
     const projectId = params.id;
 
-    const queryClient = useQueryClient();
-
     const [selectedUser, setSelectedUser] = useState("");
-
     const [openTaskModal, setOpenTaskModal] = useState(false);
-    // TASKS
-    const { data: tasks, isLoading, isError, } = useTasks(projectId)
-    // USERS
-    const { data: users, isLoading: usersLoading } = useGetUsers()
-    // PROJECT
-    const { data: project } = useGetProject(projectId)
 
+    const { data: tasks, isLoading, isError, } = useTasks(projectId)
+    const { data: users, isLoading: usersLoading } = useGetUsers()
+    const { data: project } = useGetProject(projectId)
     const removeMember = useRemoveMemberFromProject(projectId);
     const addMember = useAddMemberToProject(projectId)
 
