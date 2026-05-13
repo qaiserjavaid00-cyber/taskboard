@@ -6,6 +6,7 @@ import { cookies } from "next/headers";
 import getUser from "@/lib/helpers/getUser";
 import Task from "@/lib/models/Task";
 import User from "@/lib/models/User";
+import { updateProjectSchema } from "@/lib/validators/project";
 
 function getUserFromReq() {
     const token = cookies().get("token")?.value;
@@ -61,7 +62,57 @@ export async function GET(req, { params }) {
     return NextResponse.json(project);
 }
 
-//////EDIT/////////////////////
+// //////EDIT/////////////////////
+
+// export async function PATCH(req, { params }) {
+//     await connectDB();
+
+//     const user = getUser();
+
+//     if (!user) {
+//         return NextResponse.json(
+//             { message: "Unauthorized" },
+//             { status: 401 }
+//         );
+//     }
+
+//     const project = await Project.findById(params.id);
+
+//     if (!project) {
+//         return NextResponse.json(
+//             { message: "Project not found" },
+//             { status: 404 }
+//         );
+//     }
+
+//     const isAdmin = user?.role === "admin";
+//     const isOwner = project?.owner.toString() === user?.userId;
+
+//     if (!isAdmin && !isOwner) {
+//         return NextResponse.json(
+//             { message: "Forbidden" },
+//             { status: 403 }
+//         );
+//     }
+
+//     const body = await req.json();
+
+//     const updatedProject = await Project.findByIdAndUpdate(
+//         params.id,
+//         {
+//             title: body.title,
+//             description: body.description,
+//         },
+//         { new: true }
+//     );
+
+//     return NextResponse.json(updatedProject);
+// }
+
+/////////DELETE///////////////////////////////////
+
+
+////// EDIT /////////////////////
 
 export async function PATCH(req, { params }) {
     await connectDB();
@@ -84,8 +135,12 @@ export async function PATCH(req, { params }) {
         );
     }
 
-    const isAdmin = user?.role === "admin";
-    const isOwner = project?.owner.toString() === user?.userId;
+    const isAdmin =
+        user?.role === "admin";
+
+    const isOwner =
+        project?.owner.toString() ===
+        user?.userId;
 
     if (!isAdmin && !isOwner) {
         return NextResponse.json(
@@ -94,21 +149,58 @@ export async function PATCH(req, { params }) {
         );
     }
 
-    const body = await req.json();
+    try {
+        const body = await req.json();
 
-    const updatedProject = await Project.findByIdAndUpdate(
-        params.id,
-        {
-            title: body.title,
-            description: body.description,
-        },
-        { new: true }
-    );
+        // VALIDATION
+        const result =
+            updateProjectSchema.safeParse(body);
 
-    return NextResponse.json(updatedProject);
+        if (!result.success) {
+            return NextResponse.json(
+                {
+                    message:
+                        result.error.issues?.[0]
+                            ?.message ||
+                        "Validation failed",
+
+                    errors:
+                        result.error.issues,
+                },
+                { status: 400 }
+            );
+        }
+
+        // UPDATE
+        const updatedProject =
+            await Project.findByIdAndUpdate(
+                params.id,
+                {
+                    ...result.data,
+                },
+                { new: true }
+            );
+
+        return NextResponse.json(
+            updatedProject
+        );
+
+    } catch (error) {
+        console.log(
+            "UPDATE PROJECT ERROR:",
+            error
+        );
+
+        return NextResponse.json(
+            {
+                message:
+                    error?.message ||
+                    "Server error",
+            },
+            { status: 500 }
+        );
+    }
 }
-
-/////////DELETE///////////////////////////////////
 
 export async function DELETE(req, { params }) {
     await connectDB();

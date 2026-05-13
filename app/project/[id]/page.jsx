@@ -62,6 +62,7 @@ const ProjectDetailsPage = ({ params }) => {
             <ProjectHeader
                 projectId={projectId}
                 projectTitle={project?.title}
+                dueDate={project?.dueDate}
             />
 
             <div className="max-w-7xl mx-auto p-6 space-y-6">

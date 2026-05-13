@@ -26,12 +26,10 @@ function getUserFromReq() {
 ////////Create project/////////////////////////
 
 // export async function POST(req) {
-//     // console.log("PROJECT API HIT");
-//     // console.log("TOKEN:", cookies().get("token"));
 //     await connectDB();
 
 //     const user = getUserFromReq();
-//     // console.log("user from create project api", user)
+
 //     if (!user) {
 //         return NextResponse.json(
 //             { message: "Unauthorized" },
@@ -39,16 +37,36 @@ function getUserFromReq() {
 //         );
 //     }
 
-//     const { title, description } = await req.json();
+//     try {
+//         const body = await req.json();
 
-//     const project = await Project.create({
-//         title,
-//         description,
-//         owner: user.userId,
-//         members: [user.userId],
-//     });
+//         // ZOD VALIDATION
+//         const validatedData =
+//             createProjectSchema.parse(body);
 
-//     return NextResponse.json(project, { status: 201 });
+//         const project = await Project.create({
+//             ...validatedData,
+//             owner: user.userId,
+//             members: [user.userId],
+//         });
+
+//         return NextResponse.json(project, {
+//             status: 201,
+//         });
+
+//     } catch (error) {
+//         console.log("PROJECT CREATE ERROR:", error);
+
+//         return NextResponse.json(
+//             {
+//                 message:
+//                     error?.issues?.[0]?.message ||
+//                     error?.message ||
+//                     "Validation failed",
+//             },
+//             { status: 400 }
+//         );
+//     }
 // }
 
 export async function POST(req) {
@@ -66,12 +84,24 @@ export async function POST(req) {
     try {
         const body = await req.json();
 
-        // ZOD VALIDATION
-        const validatedData =
-            createProjectSchema.parse(body);
+        const result =
+            createProjectSchema.safeParse(body);
+
+        if (!result.success) {
+            return NextResponse.json(
+                {
+                    message:
+                        result.error.issues?.[0]
+                            ?.message ||
+                        "Validation failed",
+                    errors: result.error.issues,
+                },
+                { status: 400 }
+            );
+        }
 
         const project = await Project.create({
-            ...validatedData,
+            ...result.data,
             owner: user.userId,
             members: [user.userId],
         });
@@ -81,19 +111,18 @@ export async function POST(req) {
         });
 
     } catch (error) {
-        console.log(error);
+        console.log("PROJECT CREATE ERROR:", error);
 
         return NextResponse.json(
             {
                 message:
-                    error?.errors?.[0]?.message ||
-                    "Validation failed",
+                    error?.message ||
+                    "Server error",
             },
-            { status: 400 }
+            { status: 500 }
         );
     }
 }
-
 
 /////Get  All projects
 
