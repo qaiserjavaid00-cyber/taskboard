@@ -61,21 +61,74 @@ export async function POST(req, { params }) {
     return NextResponse.json(project);
 }
 
+// export async function DELETE(req, { params }) {
+//     await connectDB();
+
+//     const user = getUser();
+//     if (!user) {
+//         return NextResponse.json(
+//             { message: "Unauthorized" },
+//             { status: 401 }
+//         );
+//     }
+//     /////////////////////////////////////////
+//     /////           Remove Memebr       /////
+//     /////////////////////////////////////////
+//     const { id } = params; // projectId
+//     const { userId } = await req.json(); // member to remove
+
+//     const project = await Project.findById(id);
+
+//     if (!project) {
+//         return NextResponse.json(
+//             { message: "Project not found" },
+//             { status: 404 }
+//         );
+//     }
+
+//     const isAdmin = user?.role === "admin";
+//     const isOwner = project?.owner.toString() === user.userId;
+
+//     // Only owner or admin
+//     if (!isOwner && !isAdmin) {
+//         return NextResponse.json(
+//             { message: "Forbidden" },
+//             { status: 403 }
+//         );
+//     }
+//     // prevent removing owner accidentally
+//     if (project.owner.toString() === userId) {
+//         return NextResponse.json(
+//             { message: "Cannot remove project owner" },
+//             { status: 400 }
+//         );
+//     }
+
+//     // remove member
+//     project.members = project.members.filter((m) => m.toString() !== userId);
+
+//     await project.save();
+
+//     return NextResponse.json({
+//         message: "Member removed successfully",
+//         project,
+//     });
+// }
+
 export async function DELETE(req, { params }) {
     await connectDB();
 
     const user = getUser();
+
     if (!user) {
         return NextResponse.json(
             { message: "Unauthorized" },
             { status: 401 }
         );
     }
-    /////////////////////////////////////////
-    /////           Remove Memebr       /////
-    /////////////////////////////////////////
+
     const { id } = params; // projectId
-    const { userId } = await req.json(); // member to remove
+    const { userId } = await req.json();
 
     const project = await Project.findById(id);
 
@@ -89,14 +142,14 @@ export async function DELETE(req, { params }) {
     const isAdmin = user?.role === "admin";
     const isOwner = project?.owner.toString() === user.userId;
 
-    // Only owner or admin
     if (!isOwner && !isAdmin) {
         return NextResponse.json(
             { message: "Forbidden" },
             { status: 403 }
         );
     }
-    // prevent removing owner accidentally
+
+    // prevent removing owner
     if (project.owner.toString() === userId) {
         return NextResponse.json(
             { message: "Cannot remove project owner" },
@@ -104,10 +157,28 @@ export async function DELETE(req, { params }) {
         );
     }
 
-    // remove member
-    project.members = project.members.filter((m) => m.toString() !== userId);
+    /////////////////////////////////////////
+    // Remove from project members
+    /////////////////////////////////////////
+
+    project.members = project.members.filter(
+        (m) => m.toString() !== userId
+    );
 
     await project.save();
+
+    /////////////////////////////////////////
+    // Remove from all task assignees
+    /////////////////////////////////////////
+
+    await Task.updateMany(
+        { project: id },
+        {
+            $pull: {
+                assignees: userId,
+            },
+        }
+    );
 
     return NextResponse.json({
         message: "Member removed successfully",

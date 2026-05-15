@@ -18,6 +18,11 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { TaskDetailsSkeleton } from "@/components/skeletons/TaskDetailSkeleton";
 import Link from "next/link";
+import TaskDetailsHeader from "@/components/tasks/TaskDetailsHeader";
+import TaskOverviewCard from "@/components/tasks/TaskOverviewCard";
+import TaskDiscussionSection from "@/components/tasks/TaskDiscussionSection";
+import TaskInfoCard from "@/components/tasks/TaskInfoCard";
+import TaskActivityCard from "@/components/tasks/TaskActivityCard";
 
 
 const statusStyles = {
@@ -57,7 +62,7 @@ export default function TaskDetailsPage({ params }) {
         <div className="min-h-screen bg-[#0f172a] text-white">
             {/* TOP BAR */}
             <div className="border-b border-white/10 bg-white/5 backdrop-blur-md">
-                <div className="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between">
+                {/* <div className="max-w-7xl mx-auto px-6 py-5 flex items-center justify-between">
                     <div>
                         <p className="text-sm text-slate-400">
                             Task Details
@@ -89,14 +94,19 @@ export default function TaskDetailsPage({ params }) {
                             Delete
                         </button>
                     </div>
-                </div>
+                </div> */}
+                <TaskDetailsHeader
+                    task={task}
+                    onEdit={() => setOpenEdit(true)}
+                    onDelete={() => setOpenDelete(true)}
+                />
             </div>
 
             <div className="max-w-7xl mx-auto px-6 py-8 grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* MAIN */}
                 <div className="lg:col-span-2 space-y-6">
                     {/* OVERVIEW */}
-                    <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
+                    {/* <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
                         <div className="flex flex-wrap items-center gap-3 mb-5">
                             <span
                                 className={`px-3 py-1 rounded-full text-sm font-medium ${statusStyles[
@@ -131,192 +141,20 @@ export default function TaskDetailsPage({ params }) {
                             {task.description ||
                                 "No description provided."}
                         </p>
-                    </div>
+                    </div> */}
+                    <TaskOverviewCard task={task} />
 
                     {/* COMMENTS */}
-                    <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
-                        <div className="flex items-center gap-2 mb-6">
-                            <MessageSquare className="text-blue-400" />
-
-                            <h2 className="text-xl font-semibold">
-                                Discussion
-                            </h2>
-                        </div>
-
-                        <div className="mb-6">
-                            <textarea
-                                placeholder="Write a comment..."
-                                className="w-full bg-[#111827] border border-white/10 rounded-xl p-4 text-white resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                rows={4}
-                            />
-
-                            <div className="flex justify-between items-center mt-3">
-                                <button className="flex items-center gap-2 text-slate-400 hover:text-white transition">
-                                    <Paperclip size={16} />
-                                    Attach File
-                                </button>
-
-                                <button className="bg-blue-600 hover:bg-blue-700 transition px-5 py-2 rounded-xl font-medium">
-                                    Comment
-                                </button>
-                            </div>
-                        </div>
-
-                        {/* EMPTY COMMENTS */}
-                        <div className="border border-dashed border-white/10 rounded-xl p-8 text-center text-slate-400">
-                            No comments yet
-                        </div>
-                    </div>
+                    <TaskDiscussionSection />
                 </div>
 
                 {/* SIDEBAR */}
                 <div className="space-y-6">
-                    {/* META */}
-                    <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
-                        <h2 className="text-lg font-semibold mb-5">
-                            Task Info
-                        </h2>
 
-                        <div className="space-y-5">
-                            {/* CREATED BY */}
-                            <div>
-                                <p className="text-sm text-slate-400 mb-2">
-                                    Created By
-                                </p>
-
-                                <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-500 to-cyan-500 flex items-center justify-center font-semibold">
-                                        {task.createdBy?.name?.charAt(
-                                            0
-                                        )}
-                                    </div>
-
-                                    <div>
-                                        <p className="font-medium">
-                                            {
-                                                task.createdBy
-                                                    ?.name
-                                            }
-                                        </p>
-
-                                        <p className="text-xs text-slate-400">
-                                            {
-                                                task.createdBy
-                                                    ?.email
-                                            }
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* ASSIGNEES */}
-                            <div>
-                                <p className="text-sm text-slate-400 mb-3">
-                                    Assignees
-                                </p>
-
-                                <div className="space-y-3">
-                                    {task.assignees?.length >
-                                        0 ? (
-                                        task.assignees.map(
-                                            (user) => (
-                                                <div
-                                                    key={
-                                                        user._id
-                                                    }
-                                                    className="flex items-center justify-between bg-[#111827] border border-white/5 rounded-xl px-4 py-3"
-                                                >
-                                                    <div className="flex items-center gap-3">
-                                                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center font-semibold">
-                                                            {user.name?.charAt(
-                                                                0
-                                                            )}
-                                                        </div>
-
-                                                        <div>
-                                                            <p className="font-medium">
-                                                                {
-                                                                    user.name
-                                                                }
-                                                            </p>
-
-                                                            <p className="text-xs text-slate-400">
-                                                                {
-                                                                    user.email
-                                                                }
-                                                            </p>
-                                                        </div>
-                                                    </div>
-
-                                                    <CheckCircle2
-                                                        size={
-                                                            18
-                                                        }
-                                                        className="text-emerald-400"
-                                                    />
-                                                </div>
-                                            )
-                                        )
-                                    ) : (
-                                        <div className="text-slate-400 text-sm">
-                                            No assignees
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-
-                            {/* DUE DATE */}
-                            <div>
-                                <p className="text-sm text-slate-400 mb-2">
-                                    Due Date
-                                </p>
-
-                                <div className="flex items-center gap-3 bg-[#111827] border border-white/5 rounded-xl px-4 py-3">
-                                    <CalendarDays className="text-orange-400" />
-
-                                    <div>
-                                        <p className="font-medium">
-                                            {task.dueDate
-                                                ? new Date(
-                                                    task.dueDate
-                                                ).toLocaleDateString()
-                                                : "No due date"}
-                                        </p>
-
-                                        <p className="text-xs text-slate-400">
-                                            Deadline
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {/* CREATED */}
-                            <div>
-                                <p className="text-sm text-slate-400 mb-2">
-                                    Created
-                                </p>
-
-                                <div className="flex items-center gap-3 bg-[#111827] border border-white/5 rounded-xl px-4 py-3">
-                                    <Clock3 className="text-blue-400" />
-
-                                    <div>
-                                        <p className="font-medium">
-                                            {new Date(
-                                                task.createdAt
-                                            ).toLocaleDateString()}
-                                        </p>
-
-                                        <p className="text-xs text-slate-400">
-                                            Creation date
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <TaskInfoCard task={task} />
 
                     {/* ACTIVITY */}
-                    <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
+                    {/* <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
                         <h2 className="text-lg font-semibold mb-5">
                             Activity
                         </h2>
@@ -356,7 +194,8 @@ export default function TaskDetailsPage({ params }) {
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </div> */}
+                    <TaskActivityCard task={task} />
                 </div>
             </div>
             <CreateTaskModal

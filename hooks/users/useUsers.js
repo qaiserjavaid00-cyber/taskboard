@@ -15,6 +15,9 @@ export const useRemoveMemberFromProject = (projectId) => {
             queryClient.invalidateQueries({
                 queryKey: ["project", projectId],
             });
+            queryClient.invalidateQueries({
+                queryKey: ["tasks", projectId],
+            });
         },
     });
 };

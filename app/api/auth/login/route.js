@@ -61,9 +61,9 @@ export async function POST(req) {
 
     res.cookies.set("refreshToken", refreshToken, {
         httpOnly: true,
+        secure: true,
         // secure: false,
         // secure: process.env.NODE_ENV === "production",
-        secure: true,
         sameSite: "lax",
         path: "/",
     });
